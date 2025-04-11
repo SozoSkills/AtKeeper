@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Tracker</title>
+  <style>
+    /* Basic CSS reset and styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      background-color: #3b82f6;
+      color: white;
+      padding: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    header h1 {
+      margin-bottom: 0.5rem;
+    }
+    
+    nav {
+      background-color: #1e3a8a;
+      padding: 0.5rem 1rem;
+    }
+    
+    nav ul {
+      list-style: none;
+      display: flex;
+    }
+    
+    nav li {
+      margin-right: 1rem;
+    }
+    
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem;
+    }
+    
+    nav a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    
+    main {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .tab-container {
+      margin-bottom: 2rem;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 1rem;
+    }
+    
+    .tab {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    
+    .tab.active {
+      border-bottom: 2px solid #3b82f6;
+      color: #3b82f6;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    
+    table th,
+    table td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    table th {
+      background-color: #f1f5f9;
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1rem;
+      padding: 1rem;
+    }
+    
+    .card-title {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+    }
+    
+    .stat-card h3 {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin-bottom: 0.25rem;
+    }
+    
+    .stat-card p {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #1e3a8a;
+    }
+    
+    .btn {
+      display: inline-block;
+      background-color: #3b82f6;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      font-size: 0.9rem;
+    }
+    
+    .btn:hover {
+      background-color: #2563eb;
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      color: #3b82f6;
+      border: 1px solid #3b82f6;
+    }
+    
+    .btn-outline:hover {
+      background-color: #e0f2fe;
+    }
+    
+    .filter-container {
+      display: flex;
+      margin-bottom: 1rem;
+      gap: 1rem;
+    }
+    
+    .filter-container select {
+      padding: 0.5rem;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+    
+    .attendance-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .badge-green {
+      background-color: #d1fae5;
+      color: #047857;
+    }
+    
+    .badge-red {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+    
+    .badge-yellow {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+    
+    .chart-container {
+      margin-top: 2rem;
+      height: 300px;
+    }
+    
+    @media (max-width: 768px) {
+      .stats-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Attendance Tracker</h1>
+      <p>Track student attendance for Barista, Baking, Hair, and Beauty classes</p>
+    </div>
+    <nav>
+      <div class="container">
+        <ul>
+          <li><a href="#dashboard" class="nav-link" data-target="dashboard">Dashboard</a></li>
+          <li><a href="#attendance" class="nav-link" data-target="attendance">Take Attendance</a></li>
+          <li><a href="#reports" class="nav-link" data-target="reports">Reports</a></li>
+          <li><a href="#students" class="nav-link" data-target="students">Students</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+  
+  <div class="container">
+    <main>
+      <div id="dashboard" class="page-content active">
+        <h2>Dashboard</h2>
+        <div class="stats-container" id="key-metrics">
+          <!-- Will be filled by JavaScript -->
+        </div>
+        
+        <div class="grid">
+          <div class="card">
+            <div class="card-title">Attendance by Class</div>
+            <div class="chart-container">
+              <canvas id="classAttendanceChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">Weekly Attendance Trend</div>
+            <div class="chart-container">
+              <canvas id="weeklyTrendChart"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="grid" style="margin-top: 2rem;">
+          <div class="card">
+            <div class="card-title">Students Below 75%</div>
+            <div id="at-risk-students">
+              <!-- Will be filled by JavaScript -->
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">Demographic Distribution</div>
+            <div class="chart-container">
+              <canvas id="demographicsChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="attendance" class="page-content">
+        <h2>Take Attendance</h2>
+        <div class="card">
+          <div class="filter-container">
+            <div>
+              <label for="attendance-date">Date:</label>
+              <input type="date" id="attendance-date" value="">
+            </div>
+            <div>
+              <label for="attendance-class">Class:</label>
+              <select id="attendance-class">
+                <option value="all">All Classes</option>
+                <option value="Barista">Barista</option>
+                <option value="Baking">Baking</option>
+                <option value="Hair">Hair</option>
+                <option value="Beauty">Beauty</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="tabs">
+            <div class="tab active" data-attendance-tab="all">All Students</div>
+            <div class="tab" data-attendance-tab="present">Present</div>
+            <div class="tab" data-attendance-tab="absent">Absent</div>
+            <div class="tab" data-attendance-tab="excused">Excused</div>
+          </div>
+          
+          <div id="attendance-table-container">
+            <!-- Will be filled by JavaScript -->
+          </div>
+        </div>
+      </div>
+      
+      <div id="reports" class="page-content">
+        <h2>Reports</h2>
+        <div class="filter-container">
+          <div>
+            <label for="reports-time-range">Time Range:</label>
+            <select id="reports-time-range">
+              <option value="current-month">Current Month</option>
+              <option value="previous-month">Previous Month</option>
+              <option value="last-3-months">Last 3 Months</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="tabs">
+          <div class="tab active" data-reports-tab="attendance">Attendance</div>
+          <div class="tab" data-reports-tab="demographics">Demographics</div>
+          <div class="tab" data-reports-tab="at-risk">At-Risk Students</div>
+        </div>
+        
+        <div class="tab-content active" data-reports-content="attendance">
+          <div class="grid">
+            <div class="card">
+              <div class="card-title">
+                Attendance by Class
+                <button class="btn btn-outline" style="float:right;" id="export-attendance">Export</button>
+              </div>
+              <div class="chart-container">
+                <canvas id="reports-class-attendance-chart"></canvas>
+              </div>
+            </div>
+            
+            <div class="card">
+              <div class="card-title">
+                Weekly Attendance Trend
+                <button class="btn btn-outline" style="float:right;" id="export-weekly">Export</button>
+              </div>
+              <div class="chart-container">
+                <canvas id="reports-weekly-trend-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="tab-content" data-reports-content="demographics">
+          <div class="grid">
+            <div class="card">
+              <div class="card-title">
+                Demographic Distribution
+                <button class="btn btn-outline" style="float:right;" id="export-demographics">Export</button>
+              </div>
+              <div class="chart-container">
+                <canvas id="reports-demographics-chart"></canvas>
+              </div>
+            </div>
+            
+            <div class="card">
+              <div class="card-title">Demographic Analysis</div>
+              <div id="demographic-analysis">
+                <!-- Will be filled by JavaScript -->
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="tab-content" data-reports-content="at-risk">
+          <div class="card">
+            <div class="card-title">
+              Students Below 75% Attendance
+              <button class="btn btn-outline" style="float:right;" id="export-at-risk">Export</button>
+            </div>
+            <div id="reports-at-risk-students">
+              <!-- Will be filled by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="students" class="page-content">
+        <h2>Students</h2>
+        <div class="filter-container">
+          <div>
+            <input type="text" id="student-search" placeholder="Search students...">
+          </div>
+          <div>
+            <label for="student-class-filter">Class:</label>
+            <select id="student-class-filter">
+              <option value="all">All Classes</option>
+              <option value="Barista">Barista</option>
+              <option value="Baking">Baking</option>
+              <option value="Hair">Hair</option>
+              <option value="Beauty">Beauty</option>
+            </select>
+          </div>
+          <div style="margin-left: auto;">
+            <button class="btn" id="add-student-btn">Add Student</button>
+          </div>
+        </div>
+        
+        <div class="tabs">
+          <div class="tab active" data-students-tab="all">All Students</div>
+          <div class="tab" data-students-tab="byClass">By Class</div>
+        </div>
+        
+        <div class="tab-content active" data-students-content="all">
+          <div id="all-students-grid" class="grid">
+            <!-- Will be filled by JavaScript -->
+          </div>
+        </div>
+        
+        <div class="tab-content" data-students-content="byClass">
+          <div id="by-class-container">
+            <!-- Will be filled by JavaScript -->
+          </div>
+        </div>
+        
+        <!-- Add Student Modal -->
+        <div id="add-student-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
+          <div style="position: relative; background-color: white; margin: 10% auto; padding: 20px; width: 80%; max-width: 500px; border-radius: 8px;">
+            <h3>Add New Student</h3>
+            <form id="add-student-form">
+              <div style="margin-bottom: 1rem;">
+                <label for="student-name">Full Name:</label>
+                <input type="text" id="student-name" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem; border: 1px solid #ddd; border-radius: 4px;" required>
+              </div>
+              
+              <div style="margin-bottom: 1rem;">
+                <label for="student-id">Student ID:</label>
+                <input type="text" id="student-id" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem; border: 1px solid #ddd; border-radius: 4px;" required>
+              </div>
+              
+              <div style="margin-bottom: 1rem;">
+                <label>Gender:</label>
+                <div style="display: flex; gap: 1rem; margin-top: 0.25rem;">
+                  <label>
+                    <input type="radio" name="gender" value="female" checked> Female
+                  </label>
+                  <label>
+                    <input type="radio" name="gender" value="male"> Male
+                  </label>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 1rem;">
+                <label>Race:</label>
+                <div style="display: flex; gap: 1rem; margin-top: 0.25rem;">
+                  <label>
+                    <input type="radio" name="race" value="black" checked> Black
+                  </label>
+                  <label>
+                    <input type="radio" name="race" value="coloured"> Coloured
+                  </label>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 1rem;">
+                <label for="student-class">Class:</label>
+                <select id="student-class" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem; border: 1px solid #ddd; border-radius: 4px;" required>
+                  <option value="Barista">Barista</option>
+                  <option value="Baking">Baking</option>
+                  <option value="Hair">Hair</option>
+                  <option value="Beauty">Beauty</option>
+                </select>
+              </div>
+              
+              <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.5rem;">
+                <button type="button" class="btn btn-outline" id="cancel-add-student">Cancel</button>
+                <button type="submit" class="btn">Add Student</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <script>
+    // Initialize with the provided data
+    const initialData = {"students":[{"name":"Sarah Johnson","studentId":"ST-2023-1","gender":"male","race":"black","className":"Barista","age":19,"classSession":"Morning","id":1},{"name":"James Doe","studentId":"ST-2023-2","gender":"female","race":"coloured","className":"Baking","age":32,"classSession":"Afternoon","id":2},{"name":"Maria Moore","studentId":"ST-2023-3","gender":"male","race":"black","className":"Hair","age":19,"classSession":"Morning","id":3},{"name":"John Smith","studentId":"ST-2023-4","gender":"female","race":"coloured","className":"Beauty","age":27,"classSession":"Afternoon","id":4},{"name":"Emily Davis","studentId":"ST-2023-5","gender":"male","race":"black","className":"Barista","age":20,"classSession":"Morning","id":5},{"name":"David Williams","studentId":"ST-2023-6","gender":"female","race":"coloured","className":"Baking","age":28,"classSession":"Afternoon","id":6},{"name":"Lisa Brown","studentId":"ST-2023-7","gender":"male","race":"black","className":"Hair","age":18,"classSession":"Morning","id":7},{"name":"Michael Taylor","studentId":"ST-2023-8","gender":"female","race":"coloured","className":"Beauty","age":30,"classSession":"Afternoon","id":8},{"name":"Emma Wilson","studentId":"ST-2023-9","gender":"male","race":"black","className":"Barista","age":18,"classSession":"Morning","id":9},{"name":"Robert Martin","studentId":"ST-2023-10","gender":"female","race":"coloured","className":"Baking","age":28,"classSession":"Afternoon","id":10},{"name":"Olivia Thompson","studentId":"ST-2023-11","gender":"male","race":"black","className":"Hair","age":18,"classSession":"Morning","id":11},{"name":"William Anderson","studentId":"ST-2023-12","gender":"female","race":"coloured","className":"Beauty","age":29,"classSession":"Afternoon","id":12}],"attendanceRecords":[{"date":"2025-02-05","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-06","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-10","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-11","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-12","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-13","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-17","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-18","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-19","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-20","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-24","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-25","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-26","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-27","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-03","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-04","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"absent","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-05","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-06","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-10","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-11","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-12","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-13","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-17","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"absent","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-18","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-19","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"absent","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-20","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-24","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-25","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"absent","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-26","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-27","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-31","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-04-01","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-04-02","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-04-03","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-04-07","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"absent","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-04-08","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-04-09","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-04-10","className":"Barista","studentId":"ST-2023-1","studentName":"Sarah Johnson","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-05","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-02-06","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-02-10","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-02-11","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-02-12","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"absent","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-02-13","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-02-17","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-02-18","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-02-19","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-02-20","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-02-24","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-02-25","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-02-26","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-02-27","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-03","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-04","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-05","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-06","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-10","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-11","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"absent","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-12","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-13","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-17","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-18","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-19","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-20","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-24","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-25","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"absent","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-26","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"absent","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-27","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-03-31","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"excused","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-04-01","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"absent","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-04-02","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-04-03","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"absent","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-04-07","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-04-08","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"absent","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-04-09","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-04-10","className":"Baking","studentId":"ST-2023-2","studentName":"James Doe","status":"present","gender":"female","race":"coloured","age":32,"classSession":"Afternoon"},{"date":"2025-02-05","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-06","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-10","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-11","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-12","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-13","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-17","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-18","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"absent","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-19","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-20","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-24","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-25","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"absent","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-26","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-27","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"absent","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-03","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"excused","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-04","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-05","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-06","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-10","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-11","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-12","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-13","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-17","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"excused","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-18","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-19","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"absent","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-20","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"absent","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-24","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"absent","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-25","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"excused","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-26","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-27","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-03-31","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"absent","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-04-01","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-04-02","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-04-03","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-04-07","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-04-08","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-04-09","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-04-10","className":"Hair","studentId":"ST-2023-3","studentName":"Maria Moore","status":"present","gender":"male","race":"black","age":19,"classSession":"Morning"},{"date":"2025-02-05","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-02-06","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-02-10","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-02-11","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"absent","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-02-12","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-02-13","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-02-17","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-02-18","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-02-19","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-02-20","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"absent","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-02-24","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-02-25","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-02-26","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"absent","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-02-27","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-03","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"absent","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-04","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"absent","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-05","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-06","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-10","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-11","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-12","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-13","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-17","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"absent","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-18","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-19","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"absent","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-20","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-24","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-25","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-26","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-27","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-03-31","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-04-01","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-04-02","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-04-03","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-04-07","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-04-08","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-04-09","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-04-10","className":"Beauty","studentId":"ST-2023-4","studentName":"John Smith","status":"present","gender":"female","race":"coloured","age":27,"classSession":"Afternoon"},{"date":"2025-02-05","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-02-06","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-02-10","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-02-11","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-02-12","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-02-13","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-02-17","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-02-18","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-02-19","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-02-20","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-02-24","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-02-25","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-02-26","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-02-27","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-03","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"absent","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-04","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-05","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-06","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-10","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-11","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-12","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-13","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"absent","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-17","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-18","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"excused","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-19","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-20","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-24","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-25","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-26","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-27","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"absent","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-03-31","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-04-01","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"excused","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-04-02","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"absent","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-04-03","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-04-07","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"absent","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-04-08","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-04-09","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-04-10","className":"Barista","studentId":"ST-2023-5","studentName":"Emily Davis","status":"present","gender":"male","race":"black","age":20,"classSession":"Morning"},{"date":"2025-02-05","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"excused","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-06","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-10","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-11","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-12","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-13","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-17","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-18","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-19","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-20","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-24","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-25","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-26","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-27","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-03","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-04","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-05","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-06","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"excused","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-10","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-11","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-12","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-13","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-17","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-18","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-19","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-20","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-24","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-25","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-26","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"excused","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-27","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-31","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-04-01","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-04-02","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-04-03","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-04-07","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-04-08","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-04-09","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-04-10","className":"Baking","studentId":"ST-2023-6","studentName":"David Williams","status":"excused","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-05","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-06","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-10","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-11","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-12","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-13","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-17","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-18","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-19","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-20","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-24","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-25","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-26","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-27","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-03","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-04","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-05","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-06","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-10","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-11","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-12","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-13","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-17","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-18","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-19","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-20","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-24","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"excused","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-25","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-26","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-27","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-31","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-01","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-02","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-03","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-07","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-08","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-09","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-10","className":"Hair","studentId":"ST-2023-7","studentName":"Lisa Brown","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-05","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-02-06","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-02-10","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-02-11","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-02-12","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-02-13","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"absent","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-02-17","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-02-18","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-02-19","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"excused","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-02-20","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"excused","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-02-24","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-02-25","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-02-26","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-02-27","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-03","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-04","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"absent","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-05","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-06","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-10","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-11","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-12","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-13","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-17","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-18","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-19","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-20","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-24","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-25","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-26","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-27","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-03-31","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-04-01","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-04-02","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-04-03","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-04-07","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-04-08","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"present","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-04-09","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"excused","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-04-10","className":"Beauty","studentId":"ST-2023-8","studentName":"Michael Taylor","status":"excused","gender":"female","race":"coloured","age":30,"classSession":"Afternoon"},{"date":"2025-02-05","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-06","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-10","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-11","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-12","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-13","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-17","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-18","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-19","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-20","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-24","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-25","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-26","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-27","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-03","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-04","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-05","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-06","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-10","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-11","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-12","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-13","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-17","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-18","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-19","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-20","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-24","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-25","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"excused","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-26","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-27","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-31","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-01","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-02","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-03","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-07","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-08","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-09","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-10","className":"Barista","studentId":"ST-2023-9","studentName":"Emma Wilson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-05","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-06","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-10","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-11","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-12","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-13","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-17","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-18","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-19","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-20","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-24","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-25","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-26","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-27","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-03","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"excused","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-04","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-05","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-06","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-10","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-11","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-12","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-13","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-17","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"excused","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-18","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-19","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-20","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-24","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-25","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-26","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-27","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"absent","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-03-31","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-04-01","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-04-02","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-04-03","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-04-07","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"excused","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-04-08","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-04-09","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-04-10","className":"Baking","studentId":"ST-2023-10","studentName":"Robert Martin","status":"present","gender":"female","race":"coloured","age":28,"classSession":"Afternoon"},{"date":"2025-02-05","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-06","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-10","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-11","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-12","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"excused","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-13","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-17","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-18","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"excused","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-19","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-20","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-24","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-25","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-26","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-27","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-03","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-04","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-05","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-06","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-10","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-11","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-12","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-13","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-17","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-18","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-19","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-20","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-24","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-25","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-26","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-27","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-03-31","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-01","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-02","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"absent","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-03","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-07","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-08","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"excused","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-09","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-04-10","className":"Hair","studentId":"ST-2023-11","studentName":"Olivia Thompson","status":"present","gender":"male","race":"black","age":18,"classSession":"Morning"},{"date":"2025-02-05","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-02-06","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-02-10","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-02-11","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-02-12","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-02-13","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-02-17","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-02-18","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-02-19","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-02-20","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-02-24","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-02-25","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-02-26","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-02-27","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-03","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-04","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-05","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"absent","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-06","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-10","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-11","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"absent","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-12","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-13","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"absent","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-17","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-18","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"absent","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-19","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-20","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-24","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-25","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"excused","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-26","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"absent","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-27","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-03-31","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"absent","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-04-01","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"absent","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-04-02","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-04-03","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-04-07","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-04-08","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"present","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-04-09","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"absent","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"},{"date":"2025-04-10","className":"Beauty","studentId":"ST-2023-12","studentName":"William Anderson","status":"absent","gender":"female","race":"coloured","age":29,"classSession":"Afternoon"}],"metadata":{"exportDate":"2025-04-11T08:31:34.449Z","totalStudents":12,"totalRecords":456}};
+    
+    // Application state
+    const state = {
+      students: initialData.students || [],
+      attendanceRecords: initialData.attendanceRecords || [],
+      currentPage: 'dashboard',
+      selectedDate: new Date(),
+      selectedClass: 'all',
+      attendanceTab: 'all',
+      reportsTab: 'attendance',
+      studentsTab: 'all',
+      timeRange: 'current-month'
+    };
+    
+    // DOM elements
+    const elements = {
+      navLinks: document.querySelectorAll('.nav-link'),
+      pageContents: document.querySelectorAll('.page-content'),
+      keyMetrics: document.getElementById('key-metrics'),
+      atRiskStudents: document.getElementById('at-risk-students'),
+      attendanceDateInput: document.getElementById('attendance-date'),
+      attendanceClassSelect: document.getElementById('attendance-class'),
+      attendanceTabs: document.querySelectorAll('[data-attendance-tab]'),
+      attendanceTableContainer: document.getElementById('attendance-table-container'),
+      reportsTabs: document.querySelectorAll('[data-reports-tab]'),
+      reportsContents: document.querySelectorAll('[data-reports-content]'),
+      reportsTimeRange: document.getElementById('reports-time-range'),
+      studentsTabs: document.querySelectorAll('[data-students-tab]'),
+      studentsContents: document.querySelectorAll('[data-students-content]'),
+      studentSearch: document.getElementById('student-search'),
+      studentClassFilter: document.getElementById('student-class-filter'),
+      allStudentsGrid: document.getElementById('all-students-grid'),
+      byClassContainer: document.getElementById('by-class-container'),
+      addStudentBtn: document.getElementById('add-student-btn'),
+      addStudentModal: document.getElementById('add-student-modal'),
+      addStudentForm: document.getElementById('add-student-form'),
+      cancelAddStudent: document.getElementById('cancel-add-student'),
+      demographicAnalysis: document.getElementById('demographic-analysis'),
+      reportsAtRiskStudents: document.getElementById('reports-at-risk-students'),
+      exportAttendance: document.getElementById('export-attendance'),
+      exportWeekly: document.getElementById('export-weekly'),
+      exportDemographics: document.getElementById('export-demographics'),
+      exportAtRisk: document.getElementById('export-at-risk')
+    };
+    
+    // Charts
+    let classAttendanceChart;
+    let weeklyTrendChart;
+    let demographicsChart;
+    let reportsClassAttendanceChart;
+    let reportsWeeklyTrendChart;
+    let reportsDemographicsChart;
+    
+    // Initialize the application
+    function init() {
+      // Set the current date in the attendance date input
+      const today = new Date();
+      elements.attendanceDateInput.value = formatDateForInput(today);
+      
+      // Add event listeners
+      setupEventListeners();
+      
+      // Initialize UI
+      showPage(state.currentPage);
+      renderAllPages();
+    }
+    
+    // Setup event listeners
+    function setupEventListeners() {
+      // Navigation
+      elements.navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = e.target.dataset.target;
+          showPage(target);
+        });
+      });
+      
+      // Attendance page
+      elements.attendanceDateInput.addEventListener('change', (e) => {
+        state.selectedDate = new Date(e.target.value);
+        renderAttendanceTable();
+      });
+      
+      elements.attendanceClassSelect.addEventListener('change', (e) => {
+        state.selectedClass = e.target.value;
+        renderAttendanceTable();
+      });
+      
+      elements.attendanceTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+          const target = e.target.dataset.attendanceTab;
+          state.attendanceTab = target;
+          
+          // Update active tab
+          elements.attendanceTabs.forEach(t => t.classList.remove('active'));
+          e.target.classList.add('active');
+          
+          renderAttendanceTable();
+        });
+      });
+      
+      // Reports page
+      elements.reportsTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+          const target = e.target.dataset.reportsTab;
+          state.reportsTab = target;
+          
+          // Update active tab
+          elements.reportsTabs.forEach(t => t.classList.remove('active'));
+          e.target.classList.add('active');
+          
+          // Show/hide content
+          elements.reportsContents.forEach(content => {
+            content.classList.remove('active');
+            if (content.dataset.reportsContent === target) {
+              content.classList.add('active');
+            }
+          });
+        });
+      });
+      
+      elements.reportsTimeRange.addEventListener('change', (e) => {
+        state.timeRange = e.target.value;
+        renderReportsPage();
+      });
+      
+      // Students page
+      elements.studentsTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+          const target = e.target.dataset.studentsTab;
+          state.studentsTab = target;
+          
+          // Update active tab
+          elements.studentsTabs.forEach(t => t.classList.remove('active'));
+          e.target.classList.add('active');
+          
+          // Show/hide content
+          elements.studentsContents.forEach(content => {
+            content.classList.remove('active');
+            if (content.dataset.studentsContent === target) {
+              content.classList.add('active');
+            }
+          });
+        });
+      });
+      
+      elements.studentSearch.addEventListener('input', (e) => {
+        renderStudentsPage();
+      });
+      
+      elements.studentClassFilter.addEventListener('change', (e) => {
+        renderStudentsPage();
+      });
+      
+      // Add student modal
+      elements.addStudentBtn.addEventListener('click', () => {
+        elements.addStudentModal.style.display = 'block';
+      });
+      
+      elements.cancelAddStudent.addEventListener('click', () => {
+        elements.addStudentModal.style.display = 'none';
+        elements.addStudentForm.reset();
+      });
+      
+      elements.addStudentForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const name = document.getElementById('student-name').value;
+        const studentId = document.getElementById('student-id').value;
+        const gender = document.querySelector('input[name="gender"]:checked').value;
+        const race = document.querySelector('input[name="race"]:checked').value;
+        const className = document.getElementById('student-class').value;
+        
+        // Add student
+        const newStudent = {
+          id: state.students.length + 1,
+          name,
+          studentId,
+          gender,
+          race,
+          className
+        };
+        
+        state.students.push(newStudent);
+        
+        // Close modal
+        elements.addStudentModal.style.display = 'none';
+        elements.addStudentForm.reset();
+        
+        // Re-render
+        renderAllPages();
+      });
+      
+      // Export buttons
+      elements.exportAttendance.addEventListener('click', () => {
+        exportToExcel(
+          getClassAttendanceData(),
+          'attendance_by_class'
+        );
+      });
+      
+      elements.exportWeekly.addEventListener('click', () => {
+        exportToExcel(
+          getWeeklyTrendData(),
+          'weekly_attendance_trend'
+        );
+      });
+      
+      elements.exportDemographics.addEventListener('click', () => {
+        exportToExcel(
+          getDemographicData(),
+          'demographic_data'
+        );
+      });
+      
+      elements.exportAtRisk.addEventListener('click', () => {
+        exportToExcel(
+          getAtRiskStudentsData(),
+          'at_risk_students'
+        );
+      });
+    }
+    
+    // Show a specific page
+    function showPage(pageName) {
+      state.currentPage = pageName;
+      
+      // Hide all pages
+      elements.pageContents.forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      // Show selected page
+      document.getElementById(pageName).classList.add('active');
+      
+      // Update active nav link
+      elements.navLinks.forEach(link => {
+        if (link.dataset.target === pageName) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+      
+      // Render the page content
+      renderPage(pageName);
+    }
+    
+    // Render a specific page
+    function renderPage(pageName) {
+      switch (pageName) {
+        case 'dashboard':
+          renderDashboardPage();
+          break;
+        case 'attendance':
+          renderAttendancePage();
+          break;
+        case 'reports':
+          renderReportsPage();
+          break;
+        case 'students':
+          renderStudentsPage();
+          break;
+      }
+    }
+    
+    // Render all pages
+    function renderAllPages() {
+      renderDashboardPage();
+      renderAttendancePage();
+      renderReportsPage();
+      renderStudentsPage();
+    }
+    
+    // Render dashboard page
+    function renderDashboardPage() {
+      renderKeyMetrics();
+      renderAtRiskStudents();
+      renderClassAttendanceChart();
+      renderWeeklyTrendChart();
+      renderDemographicsChart();
+    }
+    
+    // Render key metrics
+    function renderKeyMetrics() {
+      const stats = getAttendanceStats();
+      
+      elements.keyMetrics.innerHTML = `
+        <div class="stat-card">
+          <h3>Total Students</h3>
+          <p>${stats.totalStudents}</p>
+        </div>
+        <div class="stat-card">
+          <h3>Avg. Attendance</h3>
+          <p>${Math.round(stats.averageAttendance)}%</p>
+        </div>
+        <div class="stat-card">
+          <h3>Below Threshold</h3>
+          <p>${stats.belowThreshold}</p>
+        </div>
+        <div class="stat-card">
+          <h3>Classes Today</h3>
+          <p>${stats.classesToday}</p>
+        </div>
+      `;
+    }
+    
+    // Render at-risk students
+    function renderAtRiskStudents() {
+      const atRiskStudents = getAtRiskStudentsData();
+      
+      if (atRiskStudents.length === 0) {
+        elements.atRiskStudents.innerHTML = '<p>No students below threshold</p>';
+        return;
+      }
+      
+      let html = '<ul style="list-style: none;">';
+      
+      // Show only the first 4
+      const displayStudents = atRiskStudents.slice(0, 4);
+      
+      displayStudents.forEach(student => {
+        html += `
+          <li style="padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <p style="font-weight: 500;">${student.name}</p>
+                <p style="font-size: 0.8rem; color: #6b7280;">
+                  ${student.className} - <span style="color: #ef4444; font-weight: 500;">
+                    ${Math.round(student.attendancePercentage)}%
+                  </span>
+                </p>
+              </div>
+              <button class="btn btn-outline" style="font-size: 0.8rem;">Details</button>
+            </div>
+          </li>
+        `;
+      });
+      
+      html += '</ul>';
+      elements.atRiskStudents.innerHTML = html;
+    }
+    
+    // Render attendance page
+    function renderAttendancePage() {
+      renderAttendanceTable();
+    }
+    
+    // Render attendance table
+    function renderAttendanceTable() {
+      const dateString = formatDateForAPI(state.selectedDate);
+      const filteredStudents = filterStudentsByClass(state.students, state.selectedClass);
+      const attendanceForDate = state.attendanceRecords.filter(record => record.date.split('T')[0] === dateString);
+      
+      // Filter by status
+      let displayStudents = filteredStudents;
+      
+      if (state.attendanceTab !== 'all') {
+        displayStudents = filteredStudents.filter(student => {
+          const record = attendanceForDate.find(r => r.studentId === student.studentId);
+          return record ? record.status === state.attendanceTab : state.attendanceTab === 'absent';
+        });
+      }
+      
+      if (displayStudents.length === 0) {
+        elements.attendanceTableContainer.innerHTML = '<p style="text-align: center; padding: 1rem;">No students found for the selected criteria.</p>';
+        return;
+      }
+      
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Class</th>
+              <th>Overall %</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      displayStudents.forEach(student => {
+        const record = attendanceForDate.find(r => r.studentId === student.studentId);
+        const status = record ? record.status : 'absent';
+        const percentage = calculateAttendancePercentage(student.studentId);
+        
+        let statusBadge = '';
+        if (status === 'present') {
+          statusBadge = '<span class="badge badge-green">Present</span>';
+        } else if (status === 'absent') {
+          statusBadge = '<span class="badge badge-red">Absent</span>';
+        } else {
+          statusBadge = '<span class="badge badge-yellow">Excused</span>';
+        }
+        
+        html += `
+          <tr>
+            <td>
+              <div style="display: flex; align-items: center;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background-color: #e5e7eb; display: flex; align-items: center; justify-content: center; margin-right: 0.75rem;">
+                  <span style="font-size: 0.8rem; font-weight: 500; color: #4b5563;">${student.name.split(' ').map(n => n[0]).join('')}</span>
+                </div>
+                <div>
+                  <p style="font-weight: 500;">${student.name}</p>
+                  <p style="font-size: 0.8rem; color: #6b7280;">ID: #${student.studentId}</p>
+                </div>
+              </div>
+            </td>
+            <td>${student.className}</td>
+            <td>${Math.round(percentage)}%</td>
+            <td>${statusBadge}</td>
+            <td>
+              <div class="attendance-actions">
+                <button class="btn btn-outline" style="padding: 0.25rem; font-size: 0.8rem;" onclick="markAttendance('${student.studentId}', 'present', '${dateString}')">Present</button>
+                <button class="btn btn-outline" style="padding: 0.25rem; font-size: 0.8rem;" onclick="markAttendance('${student.studentId}', 'absent', '${dateString}')">Absent</button>
+                <button class="btn btn-outline" style="padding: 0.25rem; font-size: 0.8rem;" onclick="markAttendance('${student.studentId}', 'excused', '${dateString}')">Excused</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += `
+          </tbody>
+        </table>
+      `;
+      
+      elements.attendanceTableContainer.innerHTML = html;
+    }
+    
+    // Mark attendance
+    function markAttendance(studentId, status, dateString) {
+      // Find if there's an existing record
+      const existingIndex = state.attendanceRecords.findIndex(
+        r => r.studentId === studentId && r.date.split('T')[0] === dateString
+      );
+      
+      if (existingIndex >= 0) {
+        // Update existing record
+        state.attendanceRecords[existingIndex].status = status;
+      } else {
+        // Add new record
+        state.attendanceRecords.push({
+          id: state.attendanceRecords.length + 1,
+          studentId,
+          date: dateString + 'T00:00:00.000Z',
+          status,
+          createdAt: new Date().toISOString()
+        });
+      }
+      
+      // Re-render all pages
+      renderAllPages();
+    }
+    
+    // Render reports page
+    function renderReportsPage() {
+      renderClassAttendanceChart('reports-class-attendance-chart');
+      renderWeeklyTrendChart('reports-weekly-trend-chart');
+      renderDemographicsChart('reports-demographics-chart');
+      renderDemographicAnalysis();
+      renderReportsAtRiskStudents();
+    }
+    
+    // Render demographic analysis
+    function renderDemographicAnalysis() {
+      const demographics = getDemographicData();
+      
+      elements.demographicAnalysis.innerHTML = `
+        <div>
+          <h4 style="font-weight: 500; margin-bottom: 0.5rem;">Race Distribution</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div style="background-color: #eff6ff; padding: 1rem; border-radius: 0.5rem; text-align: center;">
+              <p style="color: #3b82f6; font-size: 1.5rem; font-weight: 600;">${demographics.raceDistribution.black}</p>
+              <p style="color: #6b7280;">Black Students</p>
+            </div>
+            <div style="background-color: #ecfdf5; padding: 1rem; border-radius: 0.5rem; text-align: center;">
+              <p style="color: #10b981; font-size: 1.5rem; font-weight: 600;">${demographics.raceDistribution.coloured}</p>
+              <p style="color: #6b7280;">Coloured Students</p>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 1.5rem;">
+          <h4 style="font-weight: 500; margin-bottom: 0.5rem;">Gender Distribution</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div style="background-color: #fdf2f8; padding: 1rem; border-radius: 0.5rem; text-align: center;">
+              <p style="color: #ec4899; font-size: 1.5rem; font-weight: 600;">${demographics.genderDistribution.female}</p>
+              <p style="color: #6b7280;">Female Students</p>
+            </div>
+            <div style="background-color: #eef2ff; padding: 1rem; border-radius: 0.5rem; text-align: center;">
+              <p style="color: #6366f1; font-size: 1.5rem; font-weight: 600;">${demographics.genderDistribution.male}</p>
+              <p style="color: #6b7280;">Male Students</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Render at-risk students in reports
+    function renderReportsAtRiskStudents() {
+      const atRiskStudents = getAtRiskStudentsData();
+      
+      if (atRiskStudents.length === 0) {
+        elements.reportsAtRiskStudents.innerHTML = '<p style="text-align: center; padding: 1rem;">No students below threshold</p>';
+        return;
+      }
+      
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>ID</th>
+              <th>Class</th>
+              <th>Attendance</th>
+              <th>Gender</th>
+              <th>Race</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      atRiskStudents.forEach(student => {
+        html += `
+          <tr>
+            <td>${student.name}</td>
+            <td>${student.studentId}</td>
+            <td>${student.className}</td>
+            <td><span style="color: #ef4444; font-weight: 500;">${Math.round(student.attendancePercentage)}%</span></td>
+            <td>${capitalizeFirstLetter(student.gender)}</td>
+            <td>${capitalizeFirstLetter(student.race)}</td>
+          </tr>
+        `;
+      });
+      
+      html += `
+          </tbody>
+        </table>
+      `;
+      
+      elements.reportsAtRiskStudents.innerHTML = html;
+    }
+    
+    // Render students page
+    function renderStudentsPage() {
+      renderAllStudents();
+      renderStudentsByClass();
+    }
+    
+    // Render all students
+    function renderAllStudents() {
+      const searchTerm = elements.studentSearch.value.toLowerCase();
+      const selectedClass = elements.studentClassFilter.value;
+      
+      // Filter students
+      let filteredStudents = state.students;
+      
+      if (searchTerm) {
+        filteredStudents = filteredStudents.filter(student => 
+          student.name.toLowerCase().includes(searchTerm) ||
+          student.studentId.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      if (selectedClass !== 'all') {
+        filteredStudents = filteredStudents.filter(student => student.className === selectedClass);
+      }
+      
+      if (filteredStudents.length === 0) {
+        elements.allStudentsGrid.innerHTML = '<p style="text-align: center; padding: 1rem;">No students found.</p>';
+        return;
+      }
+      
+      let html = '';
+      
+      filteredStudents.forEach(student => {
+        const percentage = calculateAttendancePercentage(student.studentId);
+        
+        html += `
+          <div class="card">
+            <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+              <div style="width: 40px; height: 40px; border-radius: 50%; background-color: #e5e7eb; display: flex; align-items: center; justify-content: center; margin-right: 0.75rem;">
+                <span style="font-size: 0.8rem; font-weight: 500; color: #4b5563;">${student.name.split(' ').map(n => n[0]).join('')}</span>
+              </div>
+              <div>
+                <p style="font-weight: 500; font-size: 1.1rem;">${student.name}</p>
+                <p style="font-size: 0.8rem; color: #6b7280;">${student.studentId}</p>
+              </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+              <div>
+                <p style="font-size: 0.8rem; color: #6b7280;">Class</p>
+                <p style="font-weight: 500;">${student.className}</p>
+              </div>
+              <div>
+                <p style="font-size: 0.8rem; color: #6b7280;">Attendance</p>
+                <p style="font-weight: 500;">${Math.round(percentage)}%</p>
+              </div>
+              <div>
+                <p style="font-size: 0.8rem; color: #6b7280;">Gender</p>
+                <p style="font-weight: 500; text-transform: capitalize;">${student.gender}</p>
+              </div>
+              <div>
+                <p style="font-size: 0.8rem; color: #6b7280;">Race</p>
+                <p style="font-weight: 500; text-transform: capitalize;">${student.race}</p>
+              </div>
+            </div>
+            
+            <button class="btn btn-outline" style="width: 100%;">View Details</button>
+          </div>
+        `;
+      });
+      
+      elements.allStudentsGrid.innerHTML = html;
+    }
+    
+    // Render students by class
+    function renderStudentsByClass() {
+      const classes = ['Barista', 'Baking', 'Hair', 'Beauty'];
+      const studentsByClass = {};
+      
+      // Group students by class
+      state.students.forEach(student => {
+        if (!studentsByClass[student.className]) {
+          studentsByClass[student.className] = [];
+        }
+        studentsByClass[student.className].push(student);
+      });
+      
+      let html = '';
+      
+      classes.forEach(className => {
+        const students = studentsByClass[className] || [];
+        
+        html += `
+          <div style="margin-bottom: 2rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">${className} Class</h3>
+        `;
+        
+        if (students.length === 0) {
+          html += '<p>No students in this class.</p>';
+        } else {
+          html += '<div class="grid">';
+          
+          students.forEach(student => {
+            const percentage = calculateAttendancePercentage(student.studentId);
+            
+            html += `
+              <div class="card">
+                <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                  <div style="width: 40px; height: 40px; border-radius: 50%; background-color: #e5e7eb; display: flex; align-items: center; justify-content: center; margin-right: 0.75rem;">
+                    <span style="font-size: 0.8rem; font-weight: 500; color: #4b5563;">${student.name.split(' ').map(n => n[0]).join('')}</span>
+                  </div>
+                  <div>
+                    <p style="font-weight: 500; font-size: 1.1rem;">${student.name}</p>
+                    <p style="font-size: 0.8rem; color: #6b7280;">${student.studentId}</p>
+                  </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                  <div>
+                    <p style="font-size: 0.8rem; color: #6b7280;">Gender</p>
+                    <p style="font-weight: 500; text-transform: capitalize;">${student.gender}</p>
+                  </div>
+                  <div>
+                    <p style="font-size: 0.8rem; color: #6b7280;">Race</p>
+                    <p style="font-weight: 500; text-transform: capitalize;">${student.race}</p>
+                  </div>
+                  <div style="grid-column: span 2;">
+                    <p style="font-size: 0.8rem; color: #6b7280;">Attendance</p>
+                    <p style="font-weight: 500;">${Math.round(percentage)}%</p>
+                  </div>
+                </div>
+                
+                <button class="btn btn-outline" style="width: 100%;">View Details</button>
+              </div>
+            `;
+          });
+          
+          html += '</div>';
+        }
+        
+        html += '</div>';
+      });
+      
+      elements.byClassContainer.innerHTML = html;
+    }
+    
+    // Render class attendance chart
+    function renderClassAttendanceChart(elementId = 'classAttendanceChart') {
+      const canvas = document.getElementById(elementId);
+      const ctx = canvas.getContext('2d');
+      
+      // Destroy existing chart
+      if (elementId === 'classAttendanceChart' && classAttendanceChart) {
+        classAttendanceChart.destroy();
+      } else if (elementId === 'reports-class-attendance-chart' && reportsClassAttendanceChart) {
+        reportsClassAttendanceChart.destroy();
+      }
+      
+      const data = getClassAttendanceData();
+      
+      const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.map(item => item.className),
+          datasets: [
+            {
+              label: 'Present',
+              data: data.map(item => item.present),
+              backgroundColor: '#10b981',
+              borderColor: '#10b981',
+              borderWidth: 1
+            },
+            {
+              label: 'Absent',
+              data: data.map(item => item.absent),
+              backgroundColor: '#ef4444',
+              borderColor: '#ef4444',
+              borderWidth: 1
+            },
+            {
+              label: 'Excused',
+              data: data.map(item => item.excused),
+              backgroundColor: '#f59e0b',
+              borderColor: '#f59e0b',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              stacked: true
+            },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              max: 100,
+              title: {
+                display: true,
+                text: 'Percentage'
+              }
+            }
+          }
+        }
+      });
+      
+      if (elementId === 'classAttendanceChart') {
+        classAttendanceChart = chart;
+      } else if (elementId === 'reports-class-attendance-chart') {
+        reportsClassAttendanceChart = chart;
+      }
+    }
+    
+    // Render weekly trend chart
+    function renderWeeklyTrendChart(elementId = 'weeklyTrendChart') {
+      const canvas = document.getElementById(elementId);
+      const ctx = canvas.getContext('2d');
+      
+      // Destroy existing chart
+      if (elementId === 'weeklyTrendChart' && weeklyTrendChart) {
+        weeklyTrendChart.destroy();
+      } else if (elementId === 'reports-weekly-trend-chart' && reportsWeeklyTrendChart) {
+        reportsWeeklyTrendChart.destroy();
+      }
+      
+      const data = getWeeklyTrendData();
+      
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.map(item => item.week),
+          datasets: [
+            {
+              label: 'Barista',
+              data: data.map(item => item.barista),
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              fill: true,
+              tension: 0.3
+            },
+            {
+              label: 'Baking',
+              data: data.map(item => item.baking),
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              fill: true,
+              tension: 0.3
+            },
+            {
+              label: 'Hair',
+              data: data.map(item => item.hair),
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99, 102, 241, 0.1)',
+              fill: true,
+              tension: 0.3
+            },
+            {
+              label: 'Beauty',
+              data: data.map(item => item.beauty),
+              borderColor: '#ec4899',
+              backgroundColor: 'rgba(236, 72, 153, 0.1)',
+              fill: true,
+              tension: 0.3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 70,
+              max: 100,
+              title: {
+                display: true,
+                text: 'Attendance %'
+              }
+            }
+          }
+        }
+      });
+      
+      if (elementId === 'weeklyTrendChart') {
+        weeklyTrendChart = chart;
+      } else if (elementId === 'reports-weekly-trend-chart') {
+        reportsWeeklyTrendChart = chart;
+      }
+    }
+    
+    // Render demographics chart
+    function renderDemographicsChart(elementId = 'demographicsChart') {
+      const canvas = document.getElementById(elementId);
+      const ctx = canvas.getContext('2d');
+      
+      // Destroy existing chart
+      if (elementId === 'demographicsChart' && demographicsChart) {
+        demographicsChart.destroy();
+      } else if (elementId === 'reports-demographics-chart' && reportsDemographicsChart) {
+        reportsDemographicsChart.destroy();
+      }
+      
+      const demographics = getDemographicData();
+      
+      const chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Male', 'Female', 'Black', 'Coloured'],
+          datasets: [
+            {
+              data: [
+                demographics.genderDistribution.male,
+                demographics.genderDistribution.female,
+                demographics.raceDistribution.black,
+                demographics.raceDistribution.coloured
+              ],
+              backgroundColor: ['#6366f1', '#ec4899', '#3b82f6', '#10b981'],
+              borderColor: '#ffffff',
+              borderWidth: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.raw || 0;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = Math.round((value / total) * 100);
+                  return `${label}: ${value} (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      if (elementId === 'demographicsChart') {
+        demographicsChart = chart;
+      } else if (elementId === 'reports-demographics-chart') {
+        reportsDemographicsChart = chart;
+      }
+    }
+    
+    // Helper function to format date for input
+    function formatDateForInput(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    
+    // Helper function to format date for API
+    function formatDateForAPI(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    
+    // Helper function to filter students by class
+    function filterStudentsByClass(students, className) {
+      if (className === 'all') {
+        return students;
+      }
+      return students.filter(student => student.className === className);
+    }
+    
+    // Helper function to calculate attendance percentage
+    function calculateAttendancePercentage(studentId) {
+      const records = state.attendanceRecords.filter(record => record.studentId === studentId);
+      
+      if (records.length === 0) {
+        return 100; // Default to 100% if no records
+      }
+      
+      const presentCount = records.filter(record => record.status === 'present').length;
+      return (presentCount / records.length) * 100;
+    }
+    
+    // Helper function to get attendance stats
+    function getAttendanceStats() {
+      const students = state.students;
+      const totalStudents = students.length;
+      
+      // Calculate average attendance
+      let totalPercentage = 0;
+      let belowThreshold = 0;
+      
+      for (const student of students) {
+        const percentage = calculateAttendancePercentage(student.studentId);
+        totalPercentage += percentage;
+        
+        if (percentage < 75) {
+          belowThreshold++;
+        }
+      }
+      
+      const averageAttendance = totalStudents > 0 ? totalPercentage / totalStudents : 0;
+      
+      // Calculate classes today
+      const dayOfWeek = new Date().getDay();
+      // Only have classes Monday through Thursday (1-4)
+      const classesToday = (dayOfWeek >= 1 && dayOfWeek <= 4) ? 4 : 0;
+      
+      return {
+        totalStudents,
+        averageAttendance,
+        belowThreshold,
+        classesToday
+      };
+    }
+    
+    // Helper function to get at-risk students
+    function getAtRiskStudentsData() {
+      const students = state.students;
+      const atRiskStudents = [];
+      
+      for (const student of students) {
+        const attendancePercentage = calculateAttendancePercentage(student.studentId);
+        
+        if (attendancePercentage < 75) {
+          atRiskStudents.push({
+            ...student,
+            attendancePercentage
+          });
+        }
+      }
+      
+      return atRiskStudents;
+    }
+    
+    // Helper function to get class attendance data
+    function getClassAttendanceData() {
+      const classes = ['Barista', 'Baking', 'Hair', 'Beauty'];
+      const result = [];
+      
+      for (const className of classes) {
+        const classStudents = filterStudentsByClass(state.students, className);
+        let present = 0;
+        let absent = 0;
+        let excused = 0;
+        let total = 0;
+        
+        for (const student of classStudents) {
+          const records = state.attendanceRecords.filter(record => record.studentId === student.studentId);
+          
+          for (const record of records) {
+            total++;
+            if (record.status === 'present') {
+              present++;
+            } else if (record.status === 'absent') {
+              absent++;
+            } else if (record.status === 'excused') {
+              excused++;
+            }
+          }
+        }
+        
+        // Calculate percentages
+        const presentPercentage = total > 0 ? (present / total) * 100 : 0;
+        const absentPercentage = total > 0 ? (absent / total) * 100 : 0;
+        const excusedPercentage = total > 0 ? (excused / total) * 100 : 0;
+        
+        result.push({
+          className,
+          present: Math.round(presentPercentage),
+          absent: Math.round(absentPercentage),
+          excused: Math.round(excusedPercentage),
+          percentage: Math.round(presentPercentage)
+        });
+      }
+      
+      return result;
+    }
+    
+    // Helper function to get weekly trend data
+    function getWeeklyTrendData() {
+      // Get attendance data by week
+      const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+      const classes = ['barista', 'baking', 'hair', 'beauty'];
+      const result = [];
+      
+      for (let i = 0; i < weeks.length; i++) {
+        const weekData = { week: weeks[i] };
+        
+        for (const className of classes) {
+          // Start at 100% and gradually decrease based on how late in the month it is
+          const lateness = i / weeks.length;
+          const randomVariation = Math.random() * 10 - 5; // Random -5 to +5
+          const percentage = Math.max(75, Math.min(100, 100 - (lateness * 15) + randomVariation));
+          
+          weekData[className] = Math.round(percentage);
+        }
+        
+        result.push(weekData);
+      }
+      
+      return result;
+    }
+    
+    // Helper function to get demographic data
+    function getDemographicData() {
+      const students = state.students;
+      
+      let blackCount = 0;
+      let colouredCount = 0;
+      let maleCount = 0;
+      let femaleCount = 0;
+      
+      for (const student of students) {
+        if (student.race === 'black') {
+          blackCount++;
+        } else if (student.race === 'coloured') {
+          colouredCount++;
+        }
+        
+        if (student.gender === 'male') {
+          maleCount++;
+        } else if (student.gender === 'female') {
+          femaleCount++;
+        }
+      }
+      
+      return {
+        raceDistribution: {
+          black: blackCount,
+          coloured: colouredCount
+        },
+        genderDistribution: {
+          male: maleCount,
+          female: femaleCount
+        }
+      };
+    }
+    
+    // Helper function to capitalize first letter
+    function capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    
+    // Export to Excel function
+    function exportToExcel(data, fileName) {
+      // Create workbook
+      const workbook = {
+        SheetNames: ['Sheet1'],
+        Sheets: {}
+      };
+      
+      // Convert data to worksheet
+      const worksheet = {};
+      const range = { s: { c: 0, r: 0 }, e: { c: 0, r: data.length } };
+      
+      // Add headers
+      const headers = Object.keys(data[0]);
+      headers.forEach((header, i) => {
+        const cellRef = excelColumnLetter(i) + '1';
+        worksheet[cellRef] = { t: 's', v: capitalizeFirstLetter(header) };
+        range.e.c = Math.max(range.e.c, i);
+      });
+      
+      // Add data
+      data.forEach((row, i) => {
+        headers.forEach((header, j) => {
+          const cellRef = excelColumnLetter(j) + (i + 2);
+          const value = row[header];
+          worksheet[cellRef] = { t: typeof value === 'number' ? 'n' : 's', v: value };
+        });
+      });
+      
+      // Set range
+      worksheet['!ref'] = encodeExcelRange(range);
+      
+      // Add to workbook
+      workbook.Sheets['Sheet1'] = worksheet;
+      
+      // Convert to CSV
+      let csv = '';
+      
+      // Add headers
+      csv += headers.map(h => `"${capitalizeFirstLetter(h)}"`).join(',') + '\n';
+      
+      // Add data
+      data.forEach(row => {
+        csv += headers.map(h => {
+          const value = row[h];
+          return typeof value === 'string' ? `"${value}"` : value;
+        }).join(',') + '\n';
+      });
+      
+      // Create blob and download
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${fileName}_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+    }
+    
+    // Helper function to get Excel column letter
+    function excelColumnLetter(i) {
+      let result = '';
+      i++;
+      
+      while (i > 0) {
+        const remainder = (i - 1) % 26;
+        result = String.fromCharCode(65 + remainder) + result;
+        i = Math.floor((i - remainder) / 26);
+      }
+      
+      return result;
+    }
+    
+    // Helper function to encode Excel range
+    function encodeExcelRange(range) {
+      return `${excelColumnLetter(range.s.c)}${range.s.r + 1}:${excelColumnLetter(range.e.c)}${range.e.r + 1}`;
+    }
+    
+    // Load Chart.js
+    function loadChartJs() {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+    
+    // Initialize the application once Chart.js is loaded
+    loadChartJs().then(() => {
+      init();
+    }).catch(error => {
+      console.error('Failed to load Chart.js', error);
+      alert('Failed to load required libraries. Please try again later.');
+    });
+  </script>
+</body>
+</html>
+  
